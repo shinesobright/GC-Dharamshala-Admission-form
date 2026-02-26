@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Form | Govt College Dharamshala</title>
+    <style>
+        :root {
+            --primary-color: #003366;
+            --secondary-color: #f4f7f6;
+            --error-color: #d93025;
+            --success-color: #28a745;
+            --required-color: #e32;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--secondary-color); padding: 20px; }
+        .container { max-width: 900px; margin: 0 auto; background: #fff; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border-top: 8px solid var(--primary-color); position: relative; }
+        header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid var(--primary-color); padding-bottom: 10px; }
+        header h1 { color: var(--primary-color); margin: 0; text-transform: uppercase; }
+        .section-title { background: var(--primary-color); color: white; padding: 10px 15px; margin: 25px 0 15px 0; border-radius: 4px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .full-width { grid-column: span 2; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
+        .required::after { content: " *"; color: var(--required-color); font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        
+        #success-overlay {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 100;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            text-align: center;
+        }
+        #success-overlay h2 { color: var(--success-color); font-size: 2em; }
+        .error-text { color: var(--error-color); font-size: 12px; display: none; margin-top: 5px; }
+        .submit-btn { background: var(--primary-color); color: white; padding: 15px 30px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; display: block; margin: 30px auto 0; width: 100%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="success-overlay">
+        <h2>✓ Form Submitted!</h2>
+        <p>Your application has been received.<br>Please wait while we process your request...</p>
+    </div>
+
+    <header>
+        <h1>Govt College Dharamshala</h1>
+        <p>Official Admission Portal - 2026</p>
+    </header>
+
+    <form action="https://webto.salesforce.com/servlet/servlet.WebToLead?encoding=UTF-8&orgId=00Dg50000051DV8" method="POST" id="admissionForm" onsubmit="return validateForm(event)">
+        <input type="hidden" name="oid" value="00Dg50000051DV8">
+        <input type="hidden" name="retURL" value="https://www.gcdharamshala.ac.in/thank-you">
+
+        <div class="section-title">Step 1: Personal Details</div>
+        <div class="grid">
+            <div>
+                <label class="required">First Name</label>
+                <input id="first_name" name="first_name" type="text" required pattern="[A-Za-z\s]+" title="Only alphabets allowed">
+            </div>
+            <div>
+                <label class="required">Last Name</label>
+                <input id="last_name" name="last_name" type="text" required pattern="[A-Za-z\s]+" title="Only alphabets allowed">
+            </div>
+            <div>
+                <label class="required">Email Address</label>
+                <input id="email" name="email" type="email" required placeholder="example@domain.com">
+            </div>
+            <div>
+                <label class="required">Phone Number</label>
+                <input id="phone" name="phone" type="tel" required pattern="[6-9]{1}[0-9]{9}" title="Valid 10-digit Indian number" maxlength="10">
+            </div>
+            <div>
+                <label class="required">Date of Birth</label>
+                <input id="dob" name="00Ng500000Aa8ZB" type="date" required onchange="checkAge()">
+                <span id="age-error" class="error-text">Applicants must be between 16 and 100 years old.</span>
+            </div>
+            <div>
+                <label class="required">Aadhar Number</label>
+                <input id="aadhar" name="00Ng500000Aa8cP" type="text" required pattern="[0-9]{12}" title="Enter 12 digit Aadhar Number" maxlength="12">
+            </div>
+        </div>
+
+        <div class="section-title">Step 2: Address Information</div>
+        <div class="grid">
+            <div class="full-width"><label>Street Address</label><textarea name="street"></textarea></div>
+            <div><label>City</label><input id="city" name="city" type="text"></div>
+            <div><label>Zip/Postal Code</label><input id="zip" name="zip" type="text" pattern="[0-9]{6}" title="If provided, must be a 6 digit zip code" maxlength="6"></div>
+            <div>
+                <label class="required">State</label>
+                <select id="state" name="state" required onchange="handleLocationLogic()">
+                    <option value="">--Select State--</option>
+                    <option value="Himachal Pradesh">Himachal Pradesh</option>
+                    <option value="Punjab">Punjab</option>
+                    <option value="Haryana">Haryana</option>
+                    <option value="Delhi">Delhi</option>
+                    <option value="Chandigarh">Chandigarh</option>
+                    <option value="Other">Other States...</option>
+                </select>
+            </div>
+            <div>
+                <label class="required">Country</label>
+                <select id="country" name="country" required>
+                    <option value="India">India</option>
+                    <option value="Other">Other</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="section-title">Step 3: Academic History</div>
+        <div class="grid">
+            <div>
+                <label class="required">Last Qualification</label>
+                <select id="qual" name="00Ng500000AZQ0H" required onchange="handleQualificationChange()">
+                    <option value="">--Select--</option>
+                    <option value="12th Standard / Diploma">12th Standard / Diploma</option>
+                    <option value="Graduation">Graduation</option>
+                </select>
+            </div>
+            <div>
+                <label class="required">Percentage</label>
+                <input id="perc" name="00Ng500000Aa8u9" type="text" required 
+                       pattern="^(100(\.0{1,2})?|[0-9]{1,2}(\.[0-9]{1,2})?)$" 
+                       title="Enter value up to 100.00" placeholder="e.g. 100 or 85.45">
+            </div>
+            <div>
+                <label>Institute/School</label>
+                <input name="00Ng500000Aa8hF" type="text">
+            </div>
+            <div>
+                <label>Board/University</label>
+                <input name="00Ng500000AZQZm" type="text">
+            </div>
+        </div>
+
+        <div class="section-title">Step 4:Course</div>
+        <div class="grid">
+            <div><label class="required">Stream</label><select id="stream" name="00Ng500000AZR9F" required onchange="handleStreamChange()"><option value="">--Select--</option></select></div>
+            <div><label class="required">Department</label><select id="dept" name="00Ng500000AZRFi" required onchange="handleDeptChange()"><option value="">--Select--</option></select></div>
+            <div class="full-width"><label class="required">Course</label><select id="course" name="00Ng500000AZcEL" required><option value="">--Select--</option></select></div>
+        </div>
+
+        <button type="submit" class="submit-btn">Submit</button>
+    </form>
+</div>
+
+<script>
+    const data = {
+        "12th Standard / Diploma": {
+            "Medical": { "Medical Sciences": ["MBBS", "BDS", "B.Sc Nursing"] },
+            "Non-Medical": { 
+                "Engineering": ["B.Tech (CSE)", "B.Tech (ME)", "B.Tech (Civil)"],
+                "Applied Sciences": ["B.Sc Physics", "B.Sc Maths"]
+            },
+            "Commerce": { "Management & Commerce": ["B.Com", "BBA"] },
+            "Arts / Humanities": { "Management & Commerce": ["BBA"] }
+        },
+        "Graduation": {
+            "B.Tech / B.E": { "Technology": ["M.Tech (Data Science)", "M.Tech (AI/ML)"] },
+            "B.Sc / B.Com / B.A": { "Advanced Sciences/Commerce": ["M.Sc Chemistry", "M.Com"] },
+            "BBA / Management": { "Business Administration": ["MBA (Finance)", "MBA (Marketing)"] }
+        }
+    };
+
+    function handleLocationLogic() {
+        const state = document.getElementById('state').value;
+        const country = document.getElementById('country');
+        if (state !== "" && state !== "Other") {
+            country.value = "India";
+            country.disabled = true;
+        } else {
+            country.disabled = false;
+        }
+    }
+
+    function checkAge() {
+        const dobValue = document.getElementById('dob').value;
+        const errorSpan = document.getElementById('age-error');
+        if (!dobValue) return true;
+        const dob = new Date(dobValue);
+        const today = new Date();
+        let age = today.getFullYear() - dob.getFullYear();
+        if (age < 16 || age > 100) {
+            errorSpan.style.display = 'block';
+            return false;
+        }
+        errorSpan.style.display = 'none';
+        return true;
+    }
+
+    function validateForm(event) {
+        if (!checkAge()) {
+            event.preventDefault();
+            return false;
+        }
+        document.getElementById('success-overlay').style.display = 'flex';
+        return true;
+    }
+
+    const qualSel = document.getElementById('qual');
+    const streamSel = document.getElementById('stream');
+    const deptSel = document.getElementById('dept');
+    const courseSel = document.getElementById('course');
+
+    function handleQualificationChange() {
+        streamSel.innerHTML = '<option value="">--Select--</option>';
+        deptSel.innerHTML = '<option value="">--Select--</option>';
+        courseSel.innerHTML = '<option value="">--Select--</option>';
+        if (qualSel.value) Object.keys(data[qualSel.value]).forEach(s => streamSel.options.add(new Option(s, s)));
+    }
+
+    function handleStreamChange() {
+        deptSel.innerHTML = '<option value="">--Select--</option>';
+        courseSel.innerHTML = '<option value="">--Select--</option>';
+        if (streamSel.value) Object.keys(data[qualSel.value][streamSel.value]).forEach(d => deptSel.options.add(new Option(d, d)));
+    }
+
+    function handleDeptChange() {
+        courseSel.innerHTML = '<option value="">--Select--</option>';
+        if (deptSel.value) data[qualSel.value][streamSel.value][deptSel.value].forEach(c => courseSel.options.add(new Option(c, c)));
+    }
+</script>
+</body>
+</html>
